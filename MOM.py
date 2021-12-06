@@ -1,34 +1,77 @@
-#!/usr/bin/env python3
+"""
+// 
+//	MOM.py
+//	Median of Means pour le Deep Learning Robuste
+//
+//	Created by Vishwa Elankumaran on 01/12/2021.
+//	Copyright © 2021 Vishwa Elankumaran. All rights reserved.
+//
+"""
 
+# Packages
 import numpy as np
-import random
 
-np.random.seed(12)
-
-def _median_of_means(seq, n_blocks):
-        """
-        1. If clause to prevent n_blocks > n_observations
-        2. Dividing data in n_blocks random blocks by generating numbers 0 to n_blocks obs per block times & shuffle
-        3. List comp to iterate blocks, in each iteration we index from the total sequence the items that have been
-            selected for class i, then we compute the empirical mean over these
-        4. We return the median over the list of means
-        """
-        if n_blocks > len(seq):  # preventing the n_blocks > n_observations
-            n_blocks = int(np.ceil(len(seq) / 2))
+__author__ = "Vishwa ELANKUMARAN, Vincent SOGNO"
+__copyright__ = "Copyright 2021, Median of Means pour le Deep Learning Robuste"
+__version__ = "1.1"
+__maintainer__ = "Vishwa ELANKUMARAN, Vincent SOGNO"
+__email__ = "vishwa.elankumaran@univ-lyon2.fr, vincent.sogno@univ-lyon2.fr"
+__status__ = "in development"
     
-        # dividing seq in k random blocks
-        indic = np.array(list(range(n_blocks)) * int(len(seq) / n_blocks))
-        np.random.shuffle(indic)
+def MOM(data: list or np.ndarray, nbSplit: int) -> float:
+    """
+        Median of Means
+        
+        Calculate for each split his mean and
+        take the median of it
+
+        Parameter
+        ---------
+            data: np.ndarray or array
+                The data sample
+            
+            nbSplit: int
+                The number of split
+
+        Return
+        ------
+            float
+            MOM estimator
+    """
+    if nbSplit > len(data):
+        nbSplit: int = int(
+            np.ceil(len(data) / 2)
+        )
+    elif len(data) == 1:
+        nbSplit: int = 1
+        
+    if len(data) > 1 and len(data) % 2 == 1:
+        split: np.ndarray = np.split(
+            np.append(data, [0]), nbSplit
+        )
+
+    else:
+        split: np.ndarray = np.split(
+            data, nbSplit
+        )
     
-        # computing and saving mean per block
-        means = [np.mean(seq[list(np.where(indic == block)[0])]) for block in range(n_blocks)]
+    # Shuffle the sample
+    np.random.shuffle(data)
     
-        # return median
-        return np.median(means)
+    # Calculate mean for each split
+    means: np.ndarray = np.mean(
+        split,
+        axis = 1
+    )
+    
+    # Return the median
+    return np.median(means)
 
 
-population = np.random.normal(loc=0, size=1000, scale=1)
-sample = random.choices(population, k=100)
-print(_median_of_means(population, 10))
-print(np.mean(population))
-print((np.mean(population)-_median_of_means(population, 10))**2)
+if __name__ == "__main__":
+    import random
+    
+    population = np.random.normal(loc=0, size=1000, scale=1)
+    print(MOM(population, 10))
+
+    
