@@ -42,31 +42,29 @@ def MOM(data: list or np.ndarray, nbSplit: int) -> float:
         nbSplit: int = int(
             np.ceil(len(data) / 2)
         )
-    elif len(data) == 1:
-        nbSplit: int = 1
+#   elif len(data) == 1:
+#       nbSplit: int = 1
         
-    if len(data) > 1 and len(data) % 2 == 1:
-        split: np.ndarray = np.split(
-            np.append(data, [0]), nbSplit
-        )
-
-    else:
-        split: np.ndarray = np.split(
-            data, nbSplit
-        )
-    
     # Shuffle the sample
-    np.random.shuffle(data)
+    splitIndex: np.ndarray = np.array(
+        list(range(nbSplit)) * int(len(data) / nbSplit)
+    )
+    np.random.shuffle(splitIndex)
+    
     
     # Calculate mean for each split
-    means: np.ndarray = np.mean(
-        split,
-        axis = 1
+    means: list = np.array(
+        [
+            np.mean(
+                data[
+                    list(np.where(splitIndex == index)[0])
+                ]
+            ) for index in range(nbSplit)
+        ]
     )
     
     # Return the median
     return np.median(means)
-
 
 if __name__ == "__main__":
     import random

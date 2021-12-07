@@ -24,8 +24,14 @@ __maintainer__ = "Vishwa ELANKUMARAN, Vincent SOGNO"
 __email__ = "vishwa.elankumaran@univ-lyon2.fr, vincent.sogno@univ-lyon2.fr"
 __status__ = "in development"
 
+######################################################################
+######################################################################
+######################################################################
 
-## Calcul du risque quadratique de l'estimateur moyenne
+"""
+	Calcul du risque quadratique de l'estimateur moyenne
+"""
+	
 #y: np.ndarray = np.zeros(10000)
 #y_pred: np.ndarray = np.zeros(10000)
 #
@@ -47,7 +53,11 @@ __status__ = "in development"
 #	MSE(y, y_pred)
 #) # 9.987324808726606e-05
 #
-## Calcul du risque quadratique de l'estimateur MOM
+
+"""
+	Calcul du risque quadratique de l'estimateur MOM
+"""
+	
 #for iter in range(1000):
 #	# Echantillon
 #	sample: np.ndarray = np.random.normal(
@@ -62,8 +72,14 @@ __status__ = "in development"
 #	MSE(y, y_pred)
 #) # 9.52413586694907e-05
 
-# Comparatif de l'erreur entre l'estimateur moyenne et MOM
-# en fonction de la taille d'échantillon
+######################################################################
+######################################################################
+######################################################################
+
+""" 
+	Comparatif de l'erreur entre l'estimateur moyenne et MOM
+	en fonction de la taille de l'échantillon (gaussien)
+"""
 
 nbSamples: int = 1000
 
@@ -73,31 +89,54 @@ MSEContainer: np.ndarray = np.array(
 	[np.zeros(nbSamples) for i in range(2)]
 )
 
+# Initialisation
 y: np.ndarray = np.zeros(nbSamples)
 y_predMean: np.ndarray = np.zeros(nbSamples)
 y_predMOM: np.ndarray = np.zeros(nbSamples)
 
+# Echantillon
+# Gaussien centrée réduite
 sample: np.ndarray = np.random.normal(
 	loc = 0, scale = 1, size = nbSamples
 )
 
+## Loi de poisson
+#sample: np. ndarray = np.random.poisson(
+#	lam = 1, size = nbSamples
+#)
+#
+## Loi de Student
+#sample: np. ndarray = np.random.standard_t(
+#	df = 1, size = nbSamples
+#)
+
+# Pour l'estimateur de la moyenne empirique
 shuffle: np.ndarray = np.random.choice(
 	sample, size = nbSamples
 )
 
+# Evolution du risque qaudratique
 for nbSample in range(1, nbSamples):
 	# Moyenne des échantillon
 	y[nbSample]: float = np.mean(sample[:nbSample])
 	y_predMean[nbSample]: float = np.mean(shuffle[:nbSample])
 	y_predMOM[nbSample]: float = MOM(sample[:nbSample], 10)
 	
+	# Calcul du risque quadratique
 	MSEContainer[0][nbSample]: float = MSE(y[:nbSample], y_predMean[:nbSample])
 	MSEContainer[1][nbSample]: float = MSE(y[:nbSample], y_predMOM[:nbSample])
 	
-
+# Affichage de l'évolution du MSE
 graph2D(
 	xContainer = np.array([np.arange(nbSamples) for i in range(2)]),
 	yContainer = MSEContainer,
+	# Blue pour l'estimateur moyenne et rouge pour l'estimateur MOM
+	color = np.array(["steelblue", "red"]),
 	title = "Evolution du MSE"
 )
 
+# Estimateur MOM meilleur en général mais plus long à calculer "complexité"
+
+######################################################################
+######################################################################
+######################################################################
