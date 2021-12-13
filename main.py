@@ -13,13 +13,16 @@ import numpy as np
 import random
 
 # Files
+from Mean import Mean
 from MSE import MSE
 from MOM import MOM
+from RobustMOM import RobustMOM
+from MSEBenchmark import MSEBenchmark
 from Display.graph2D import graph2D
 
 __author__ = "Vishwa ELANKUMARAN, Vincent SOGNO"
 __copyright__ = "Copyright 2021, Median of Means pour le Deep Learning Robuste"
-__version__ = "1.1"
+__version__ = "1.2"
 __maintainer__ = "Vishwa ELANKUMARAN, Vincent SOGNO"
 __email__ = "vishwa.elankumaran@univ-lyon2.fr, vincent.sogno@univ-lyon2.fr"
 __status__ = "in development"
@@ -32,111 +35,57 @@ __status__ = "in development"
 	Calcul du risque quadratique de l'estimateur moyenne
 """
 	
-#y: np.ndarray = np.zeros(10000)
-#y_pred: np.ndarray = np.zeros(10000)
-#
-#for iter in range(10000):
-#	# Echantillon
-#	sample: np.ndarray = np.random.normal(
-#		loc = 0, scale = 1, size = 10000
-#	)
-#	
-#	shuffle: np.ndarray = np.random.choice(
-#		sample, size = 10000
-#	)
-#	
-#	# Moyenne des échantillon
-#	y[iter]: float = np.mean(sample)
-#	y_pred[iter]: float = np.mean(shuffle)
-#	
-#print(
-#	MSE(y, y_pred)
-#) # 9.987324808726606e-05
-#
 
 """
 	Calcul du risque quadratique de l'estimateur MOM
 """
 	
-#for iter in range(1000):
-#	# Echantillon
-#	sample: np.ndarray = np.random.normal(
-#		loc = 0, scale = 1, size = 10000
-#	)
-#	
-#	# Moyenne des échantillon
-#	y[iter]: float = np.mean(sample)
-#	y_pred[iter]: float = MOM(sample, 100)
-#	
-#print(
-#	MSE(y, y_pred)
-#) # 9.52413586694907e-05
 
 ######################################################################
 ######################################################################
 ######################################################################
 
 """ 
-	Comparatif de l'erreur entre l'estimateur moyenne et MOM
+	Comparatif de l'erreur entre l'estimateur moyenne/MOM/Robust MOM
 	en fonction de la taille de l'échantillon (gaussien)
 """
 
-nbSamples: int = 1000
+N: int = 1000
 
-# La premiere liste sera pour les moyennes et la
-# deuxième liste sera pour la MOM
-MSEContainer: np.ndarray = np.array(
-	[np.zeros(nbSamples) for i in range(2)]
-)
-
+# Calcul du risque quadratique
 # Initialisation
-y: np.ndarray = np.zeros(nbSamples)
-y_predMean: np.ndarray = np.zeros(nbSamples)
-y_predMOM: np.ndarray = np.zeros(nbSamples)
-
-# Echantillon
-# Gaussien centrée réduite
-sample: np.ndarray = np.random.normal(
-	loc = 0, scale = 1, size = nbSamples
+MSEContainer: np.ndarray = np.array(
+	[np.zeros(N) for i in range(3)]
 )
 
-## Loi de poisson
-#sample: np. ndarray = np.random.poisson(
-#	lam = 1, size = nbSamples
-#)
-#
-## Loi de Student
-#sample: np. ndarray = np.random.standard_t(
-#	df = 1, size = nbSamples
-#)
-
-# Pour l'estimateur de la moyenne empirique
-shuffle: np.ndarray = np.random.choice(
-	sample, size = nbSamples
+# Erreur quadratique pour l'estimateur moyenne
+MSEContainer[0]: np.ndarray = np.array(
+	[MSEBenchmark(Mean, N)]
 )
 
-# Evolution du risque qaudratique
-for nbSample in range(1, nbSamples):
-	# Moyenne des échantillon
-	y[nbSample]: float = np.mean(sample[:nbSample])
-	y_predMean[nbSample]: float = np.mean(shuffle[:nbSample])
-	y_predMOM[nbSample]: float = MOM(sample[:nbSample], 10)
-	
-	# Calcul du risque quadratique
-	MSEContainer[0][nbSample]: float = MSE(y[:nbSample], y_predMean[:nbSample])
-	MSEContainer[1][nbSample]: float = MSE(y[:nbSample], y_predMOM[:nbSample])
-	
+# Erreur quadratique pour l'estimateur MOM
+MSEContainer[1]: np.ndarray = np.array(
+	[MSEBenchmark(MOM, N, 10)]
+)
+
+# Erreur quadratique pour l'estimateur Robust MOM
+MSEContainer[2]: np.ndarray = np.array(
+	[MSEBenchmark(RobustMOM, N, 10)]
+)
+
+
 # Affichage de l'évolution du MSE
 graph2D(
-	xContainer = np.array([np.arange(nbSamples) for i in range(2)]),
+	xContainer = np.array([np.arange(N) for i in range(3)]),
 	yContainer = MSEContainer,
 	# Blue pour l'estimateur moyenne et rouge pour l'estimateur MOM
-	color = np.array(["steelblue", "red"]),
+	# Et noir pour MOM Robuste
+	color = np.array(["steelblue", "red", "black"]),
 	title = "Evolution du MSE"
 )
 
-# Estimateur MOM meilleur en général mais plus long à calculer "complexité"
-
-######################################################################
-######################################################################
-######################################################################
+## Estimateur MOM et Roust MOM meilleur en général mais plus long à calculer "complexité"
+#
+#######################################################################
+#######################################################################
+#######################################################################
