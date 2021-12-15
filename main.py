@@ -13,11 +13,13 @@ import numpy as np
 import random
 
 # Files
-from Mean import Mean
-from MSE import MSE
-from MOM import MOM
-from RobustMOM import RobustMOM
-from MSEBenchmark import MSEBenchmark
+from Estimator.Mean import Mean
+from Estimator.MOM import MOM
+from Estimator.RobustMOM import RobustMOM
+
+from MSE.MSE import MSE
+from MSE.MSEBenchmark import MSEBenchmark
+
 from Display.graph2D import graph2D
 
 __author__ = "Vishwa ELANKUMARAN, Vincent SOGNO"
@@ -50,7 +52,7 @@ __status__ = "in development"
 	en fonction de la taille de l'échantillon (gaussien)
 """
 
-N: int = 1000
+N: int = 500
 
 # Calcul du risque quadratique
 # Initialisation
@@ -73,15 +75,17 @@ MSEContainer[2]: np.ndarray = np.array(
 	[MSEBenchmark(RobustMOM, N, 10)]
 )
 
-
 # Affichage de l'évolution du MSE
 graph2D(
 	xContainer = np.array([np.arange(N) for i in range(3)]),
 	yContainer = MSEContainer,
 	# Blue pour l'estimateur moyenne et rouge pour l'estimateur MOM
 	# Et noir pour MOM Robuste
-	color = np.array(["steelblue", "red", "black"]),
-	title = "Evolution du MSE"
+	color = np.array(["steelblue", "red", "seagreen"]),
+	title = "Evolution du MSE",
+	legend = np.array(["Moyenne", "MOM", "Robust MOM"]),
+	xLabel = "Itération",
+	yLabel = "Mean Squared Error"
 )
 
 ## Estimateur MOM et Roust MOM meilleur en général mais plus long à calculer "complexité"
